@@ -22,13 +22,19 @@ class S3DirectWidget(widgets.TextInput):
         file_url = value or ''
         csrf_cookie_name = getattr(settings, 'CSRF_COOKIE_NAME', 'csrftoken')
 
+        url_pieces = file_url.split('/')
+        try:
+            media_file_uri = os.path.join(settings.MEDIA_URL, url_pieces[-2], url_pieces[-1])
+        except IndexError:
+            media_file_uri = ''
+
         ctx = {
             'policy_url': reverse('s3direct'),
             'signing_url': reverse('s3direct-signing'),
             'dest': self.dest,
             'name': name,
             'csrf_cookie_name': csrf_cookie_name,
-            'file_url': file_url,
+            'file_url': media_file_uri,
             'file_name': os.path.basename(urlunquote_plus(file_url)),
         }
 
